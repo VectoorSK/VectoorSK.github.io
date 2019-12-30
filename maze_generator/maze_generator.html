@@ -1,0 +1,197 @@
+
+<title>Maze Generator</title>
+<!--<link href="./style.css" rel="stylesheet" type="text/css"/>-->
+<link href="./maze.ico" rel="icon"/>
+
+<style type="text/css">
+	canvas {
+	    margin: auto;
+	    display: block;
+	}
+</style>
+
+<canvas id="screen" width="600" height="600"></canvas>
+
+<script type="text/javascript">
+var playGame;
+var canvas;
+
+rows = 30;
+cols = 30;
+cellS = 22;
+grid = [];
+
+var current;
+
+stack = [];
+
+window.onload = function() {
+	canvas = document.getElementById("screen");
+	canvas.width = cols*cellS + 2; 
+	canvas.height = rows*cellS + 2;
+	ctx = canvas.getContext("2d");
+	document.addEventListener("keydown", keyPush);
+
+	for(var i = 0; i < cols; i++) {
+		grid[i] = [];
+		for(var j = 0; j < rows; j++) {
+			grid[i][j] = new cell(i, j, false);
+		}
+	}
+	current = new cell(0, 0, true);
+	
+	for(var i = 0; i < cols; i++) {
+		for(var j = 0; j < rows; j++) {
+			grid[i][j].show();
+		}
+	}
+}
+
+function game() {
+	ctx.fillStyle = "black";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "white";
+	ctx.fillRect(1, 1, canvas.width-2, canvas.height-2);
+
+
+	for(var i = 0; i < cols; i++) {
+		for(var j = 0; j < rows; j++) {
+			grid[i][j].show();
+		}
+	}
+
+	current.visit(grid);
+	current.visited = true;
+	current.show();
+	neighbors = current.checkAround(grid);
+	if(neighbors[0] || neighbors[1] || neighbors[2] || neighbors[3]) {
+		stack.push(current);
+		do {
+			rand = Math.floor(Math.random()*4);	
+		} while(!neighbors[rand]);
+		if(rand == 0) {
+			grid[current.i][current.j].borderLeft = false;
+			grid[current.i - 1][current.j].borderRight = false;
+			newCurrent = new cell(current.i - 1, current.j, true);
+			current = newCurrent;
+		}
+		else if(rand == 1) {
+			grid[current.i][current.j].borderBot = false;
+			grid[current.i][current.j + 1].borderTop = false;
+			newCurrent = new cell(current.i, current.j + 1, true);
+			current = newCurrent;
+		}
+		else if(rand == 2) {
+			grid[current.i][current.j].borderRight = false;
+			grid[current.i + 1][current.j].borderLeft = false;
+			newCurrent = new cell(current.i + 1, current.j, true);
+			current = newCurrent;
+		}
+		else {
+			grid[current.i][current.j].borderTop = false;
+			grid[current.i][current.j - 1].borderBot = false;
+			
+			newCurrent = new cell(current.i, current.j - 1, true);
+			current = newCurrent;
+		}
+	}
+	else if(stack.length > 0) {
+		newCurrent = stack.pop();
+		current = newCurrent;
+	}
+	else {
+		current.current = false;
+		current.borderTop = false;
+		current.borderBot = false;
+		current.borderLeft = false;
+		current.borderRight = false;
+		current.show();
+		console.log('end');
+		clearInterval(playGame);
+	}
+	//console.log(stack);
+}
+
+function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 32: //SPACE BAR
+			playGame = setInterval(game, 1000/60);
+			break;
+	}
+}
+
+function cell(i, j, current) {
+	this.i = i;
+	this.j = j;
+	this.w = cellS;
+	this.x = i*this.w;
+	this.y = j*this.w;
+	this.current = current;
+	this.visited = false;
+	this.borderTop = true;
+	this.borderRight = true;
+	this.borderBot = true;
+	this.borderLeft = true;
+
+	this.show = function() {
+		if(this.current) {
+			ctx.fillStyle = "rgba(0, 0, 255, 0.5)";
+		}
+		else if(this.visited) {
+			ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+		}
+		else {
+			ctx.fillStyle = "white";
+		}
+		ctx.fillRect(this.x+1, this.y+1, this.w, this.w);
+
+		ctx.strokeStyle = "black";
+		ctx.lineWeight = 2;
+		if(this.borderTop) {
+			ctx.beginPath();
+			ctx.moveTo(this.x + 1, this.y + 1);
+			ctx.lineTo(this.x + 1 + this.w, this.y + 1);
+			ctx.stroke();
+		}
+		if(this.borderRight) {
+			ctx.beginPath();
+			ctx.moveTo(this.x + 1 + this.w, this.y + 1);
+			ctx.lineTo(this.x + 1 + this.w, this.y + 1 + this.w);
+			ctx.stroke();
+		}
+		if(this.borderBot) {
+			ctx.beginPath();
+			ctx.moveTo(this.x + 1, this.y + 1 + this.w);
+			ctx.lineTo(this.x + 1 + this.w, this.y + 1 + this.w);
+			ctx.stroke();
+		}
+		if(this.borderLeft) {
+			ctx.beginPath();
+			ctx.moveTo(this.x + 1, this.y + 1);
+			ctx.lineTo(this.x + 1, this.y + 1 + this.w);
+			ctx.stroke();
+		}
+	}
+
+	this.visit = function(grid) {
+		grid[this.i][this.j].visited = true;
+	}
+
+	this.checkAround = function(grid) {
+		res = [true, true, true, true];
+		if(this.i - 1 < 0 || grid[this.i - 1][this.j].visited) { //top
+			res[0] = false;
+		}
+		if(this.j + 1 >= rows || grid[this.i][this.j + 1].visited) { //right
+			res[1] = false;
+		}
+		if(this.i + 1 >= cols || grid[this.i + 1][this.j].visited) { //bottom
+			res[2] = false;
+		}
+		if(this.j - 1 < 0 || grid[this.i][this.j - 1].visited) { //left
+			res[3] = false;
+		}
+		return res;
+	}
+}
+</script>

@@ -1,0 +1,423 @@
+
+<title>Tetris</title>
+<link href="./tetris.ico" rel="icon"/>
+
+<style type="text/css">
+	canvas {
+	    margin: auto;
+	    display: block;
+	}
+</style>
+
+<canvas id="next" width="301" height="80" ></canvas>
+<canvas id="screen" width="301" height="601"></canvas>
+<canvas id="score" width="301" height="60"></canvas>
+
+<script type="text/javascript">
+var playGame, titleScreen;
+var gravity;
+var canvas, nextCanv, scoreCanv;
+
+colors = ["#ff1010", "Gold", "DodgerBlue", "lime", "LightPink", "DarkOrange", "Indigo"];
+
+var started = false, nc = 0, cnt = 0;
+
+grid = [];
+cols = 10;
+rows = 20;
+tileSize = 30;
+pScore = 0;
+
+currentShape = ["0000011001100000", "0000000011110000", "0000010011100000", "0000110001100000", "0000011011000000", "0000100011100000", "0000001011100000"];
+bloc = [];
+
+window.onload = function() {
+	canvas = document.getElementById("screen");
+	nextCanv = document.getElementById("next");
+	scoreCanv = document.getElementById("score");
+	ctx = canvas.getContext("2d");
+	ctxN = nextCanv.getContext("2d");
+	ctxS = scoreCanv.getContext("2d");
+	document.addEventListener("keydown", keyPush);
+	document.addEventListener("keydown", game);
+	document.addEventListener("keyup", keyUp);
+	titleScreen = setInterval(start, 1000/4);
+
+	for(var i = 0; i < cols; i++) {
+		grid[i] = [];
+		for(var j = 0; j < rows; j++) {
+			grid[i].push(new cell(i, j, true));
+		}
+	}
+
+	for(var i = 0; i < 4; i++) {
+		rand = Math.floor(Math.random()*7);
+		bloc.push(new square(3, 0, rand));
+		bloc[i].load();
+		bloc[i].loadShape();
+	}
+}
+
+function start() {
+	//backgrounds
+	ctx.fillStyle = "black";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "white";
+	ctxN.fillStyle = "white";
+	ctxS.fillStyle = "white";
+	ctx.fillRect(1, 1, canvas.width - 2, canvas.height - 2);
+	ctxN.fillRect(0, 0, nextCanv.width, nextCanv.height);
+	ctxS.fillRect(0, 0, scoreCanv.width, scoreCanv.height);
+
+	ctx.textAlign = "center";
+	ctx.font = "bold 50px Arial";
+	rand = Math.floor(Math.random()*7);
+	ctx.fillStyle = colors[rand];
+	ctx.fillText("TETRIS", canvas.width/2, canvas.height/3);
+	ctx.fillStyle = "black";
+	if(cnt > 2) {
+		if(nc == 0) {
+			ctx.fillStyle = "black";
+			nc++;
+		}
+		else {
+			ctx.fillStyle = "white";
+			nc--;
+		}
+		cnt = 0;
+	}
+	cnt++;
+	ctx.font = "bold 20px Arial";
+	ctx.fillText("Press ENTER to play!", canvas.width/2, canvas.height*2/3);
+}
+
+function game(evt) {
+	//backgrounds
+	ctx.fillStyle = "gray";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	ctxN.fillStyle = "white";
+	ctxN.fillRect(0, 0, nextCanv.width, nextCanv.height);
+
+	ctxS.fillStyle = "white";
+	ctxS.fillRect(0, 0, scoreCanv.width, scoreCanv.height);
+
+	//score
+	ctxS.font = "bold 30px Arial";
+	ctxS.textAlign = "center";
+	ctxS.fillStyle = "black";
+	ctxS.fillText("Score: " + pScore, scoreCanv.width/2, scoreCanv.height/2);
+
+	//grille de jeu
+	for(var i = 0; i < cols; i++) {
+		for(var j = 0; j < rows; j++) {
+			grid[i][j].show();			
+		}
+	}
+
+	bloc[0].show();
+	bloc[0].update(grid);
+	if(bloc[0].destroy) {
+		bloc[0].fix(grid);
+		bloc.shift();
+		rand = Math.floor(Math.random()*7);
+		bloc.push(new square(3, 0, rand));
+		bloc[bloc.length-1].load();
+		bloc[bloc.length-1].loadShape();
+	}
+
+	//affichage pieces suivantes
+	ctxN.font = "bold 18px Arial";
+	ctxN.fillStyle = "black";
+	ctxN.fillText("Next blocs:", 40,  nextCanv.height/2);
+
+	for(var i = 0; i < 4; i++) {
+		for(var j = 0; j < 4; j++) {
+			if(bloc[1].shape.charAt(4*i + j) == 1) {
+				ctxN.fillStyle = bloc[1].c;
+				ctxN.fillRect((10 + i)*tileSize/2 + 1, (j+1)*tileSize/2 + 1, tileSize/2 - 1, tileSize/2 - 1);
+			}
+			if(bloc[2].shape.charAt(4*i + j) == 1) {
+				ctxN.fillStyle = bloc[2].c;
+				ctxN.fillRect((13 + i)*tileSize/2 + 1, (j+1)*tileSize/2 + 1, tileSize/2 - 1, tileSize/2 - 1);
+			}
+			if(bloc[3].shape.charAt(4*i + j) == 1) {
+				ctxN.fillStyle = bloc[3].c;
+				ctxN.fillRect((16 + i)*tileSize/2 + 1, (j+1)*tileSize/2 + 1, tileSize/2 - 1, tileSize/2 - 1);
+			}
+		}
+	}
+
+	//suppression des lignes completes
+	nb = 0;
+	for(var i = 0; i < rows; i++) {
+		done = true;
+		for(var j = 0; j < cols; j++) {
+			if(grid[j][i].c === "white") {
+				done = false;
+			}
+		}
+		if(done) {
+			nb++;
+			for(var j = 0; j < cols; j++) {
+				grid[j][i].c = "white";
+			}
+			grid = shiftAll(grid, i);
+		}
+	}
+	//ajout du score
+	if(nb > 0) {
+		if(nb == 1)	pScore += 40;
+		else if(nb == 2)	pScore += 100;
+		else if(nb == 3)	pScore += 300;
+		else if(nb == 4)	pScore += 1200;
+		nb = 0;
+	}
+}
+
+function shiftAll(grid, index) {
+	newGrid = [];
+	for(var i = 0; i < cols; i++) {
+		newGrid[i] = [];
+		for(var j = 0; j < rows; j++) {
+			newGrid[i].push(new cell(i, j, true));
+			if(j != 0 && j <= index) {
+				newGrid[i][j].set = grid[i][j-1].set;
+				newGrid[i][j].c = grid[i][j-1].c;
+			}
+			else if (j > index) {
+				newGrid[i][j].set = grid[i][j].set;
+				newGrid[i][j].c = grid[i][j].c;
+			}
+		}
+	}
+	return newGrid;
+}
+
+function gravity() {	
+	//bloc[0].down();
+}
+
+function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 13: //ENTER
+			if(!started) {
+				clearInterval(titleScreen);
+				playGame = setInterval(game, 1000/15);
+				gravity = setInterval(gravity, 1000);
+				started = true;
+			}
+			break;
+
+		case 37: //LEFT
+			if(started) {
+				bloc[0].left();
+			}
+			break;
+
+		case 38: //UP
+			if(started) {
+				bloc[0].rotate();
+			}
+			break;
+
+		case 39: //RIGHT
+			if(started) {
+				bloc[0].right();
+			}
+			break;
+
+		case 40:  //DOWN
+			if(started) {
+				bloc[0].down();
+			}
+			break;
+	}
+}
+
+function keyUp(evt) {
+	switch(evt.keyCode) {
+		case 32: //SPACE BAR
+			if(started) {
+				while(!bloc[0].stop) {
+					bloc[0].down();
+					bloc[0].update(grid);
+					bloc[0].show();
+				}
+			}
+			break;
+	}
+}
+
+function cell(i, j, set) {
+	this.w = tileSize;
+	this.x = i * this.w;
+	this.y = j * this.w;
+	this.set = set;
+	this.c = "white";
+
+	this.show = function() {
+		if(this.set){
+			ctx.fillStyle = this.c;
+			ctx.fillRect(this.x + 1, this.y + 1, this.w - 1, this.w - 1);
+		}
+	}
+
+	this.update = function(grid) {
+		
+	}
+
+	this.check = function(grid, dir) {
+		I = this.x / this.w;
+		J = this.y / this.w;
+		if(dir == "left") { //gauche
+			if(I-1 < 0 || grid[I-1][J].c != "white") {
+				return true;
+			}
+		}
+		else if(dir == "down") { //bas
+			if(J+1 >= rows || grid[I][J+1].c != "white") {
+				return true;
+			}
+		}
+		else if(dir == "right") { //droite
+			if(I+1 >= cols || grid[I+1][J].c != "white") {
+				return true;
+			}
+		}
+		return false;
+	}
+}
+
+function square(i, j, shape) {
+	this.x = i*tileSize;
+	this.y = j*tileSize;
+	this.shape = currentShape[shape];
+	this.c = colors[shape];
+	this.cell = [];
+	this.stop = false;
+	this.destroy = false;
+
+	this.load = function() {
+		for(var k = 0; k < 4; k++) {
+			this.cell[k] = [];
+			for(var l = 0; l < 4; l++) {
+				this.cell[k].push(new cell(i + k, j + l, false));
+			}
+		}
+	}
+
+	this.loadShape = function() {
+		for(var k = 0; k < 4; k++) {
+			for(var l = 0; l < 4; l++) {
+				if(this.shape.charAt(4*k + l) == 1) {
+					this.cell[k][l].set = true;
+					this.cell[k][l].c = this.c;
+				}
+				else {
+					this.cell[k][l].set = false;
+				}
+			}
+		}
+	}
+
+	this.update = function(grid) {
+		for(var k = 0; k < 4; k++) {
+			for(var l = 0; l < 4; l++) {
+				this.cell[k][l].x = this.x + k*tileSize;
+				this.cell[k][l].y = this.y + l*tileSize;
+
+				if(this.cell[k][l].set) {
+					if(this.cell[k][l].x > canvas.width - 10) {
+						this.left();
+					}
+					if(this.cell[k][l].x < 0) {
+						this.right();
+					}
+					if(this.cell[k][l].y + tileSize > canvas.height - 10) {
+						this.stop = true;
+						this.destroy = true;
+					}
+					if(this.cell[k][l].check(grid, "down")) {
+						this.stop = true;
+						this.destroy = true;
+					}
+				}
+			}
+		}
+	}
+
+	this.show = function() {
+		for(var k = 0; k < 4; k++) {
+			for(var l = 0; l < 4; l++) {
+				this.cell[k][l].show();
+			}
+		}
+	}
+
+	this.down = function() {
+		for(var k = 0; k < 4; k++) {
+			for(var l = 0; l < 4; l++) {
+				if(this.cell[k][l].set && this.cell[k][l].check(grid, "down")) {
+					return false;
+				}
+			}
+		}
+		this.y += tileSize;
+		return true;
+	}
+
+	this.right = function() {
+		for(var k = 0; k < 4; k++) {
+			for(var l = 0; l < 4; l++) {
+				/*if(this.cell[k][l].set && this.cell[k][l].x >= canvas.width - tileSize - 1) {
+					return;
+				}*/
+				if(this.cell[k][l].set && this.cell[k][l].check(grid, "right")) {
+					return;
+				}
+			}
+		}
+		this.x += tileSize;
+	}
+
+	this.left = function() {
+		for(var k = 0; k < 4; k++) {
+			for(var l = 0; l < 4; l++) {
+				/*if(this.cell[k][l].set && this.cell[k][l].x <= 0) {
+					return;
+				}*/
+				if(this.cell[k][l].set && this.cell[k][l].check(grid, "left")) {
+					return;
+				}
+			}
+		}
+		this.x -= tileSize;
+	}
+
+	this.rotate = function() {
+		newShape = "";
+		for(var i = 4; i >= 1; i--) {
+			for(var j = 4; j >= 1; j--) {
+				newShape += this.shape.charAt(4*j-i);
+			}
+		}
+		this.shape = newShape;
+		this.loadShape();
+	}
+
+	this.fix = function(grid) {
+		for(var k = 0; k < 4; k++) {
+			for(var l = 0; l < 4; l++) {
+				if(this.cell[k][l].set) {
+					i = this.cell[k][l].x/tileSize;
+					j = this.cell[k][l].y/tileSize;
+					grid[i][j].set = true;
+					grid[i][j].c = this.c;
+				}
+			}
+		}
+	}
+}
+
+</script>

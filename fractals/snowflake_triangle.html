@@ -1,0 +1,118 @@
+
+<title>Koch Snowflake</title>
+<!--<link href="./style.css" rel="stylesheet" type="text/css"/>-->
+<link href="" rel="icon"/>
+
+<style type="text/css">
+	canvas {
+	    margin: auto;
+	    display: block;
+	}
+</style>
+
+<canvas id="screen" width="600" height="675"></canvas>
+
+<script type="text/javascript">
+var playGame;
+var canvas;
+
+lines = [];
+triangles = [];
+
+window.onload = function() {
+	canvas = document.getElementById("screen");
+	ctx = canvas.getContext("2d");
+	document.addEventListener("keydown", keyPush);
+	playGame = setInterval(game, 1000/60);
+
+	length = 500;
+	x1 = canvas.width/2;
+	y1 = 50;
+	x2 = x1 + Math.cos(60 * Math.PI / 180) * length;
+	y2 = y1 + Math.sin(60 * Math.PI / 180) * length;
+	x3 = x1 + Math.cos(120 * Math.PI / 180) * length;
+	y3 = y1 + Math.sin(120 * Math.PI / 180) * length;
+	lines.push(new line(x1, y1, x2, y2));
+	lines.push(new line(x2, y2, x3, y3));
+	lines.push(new line(x3, y3, x1, y1));
+	triangles.push(new triangle(x1, y1, x2, y2, x3, y3));
+}
+
+function game() {
+	//backgrounds
+	ctx.fillStyle = "black";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "white";
+	ctx.fillRect(1, 1, canvas.width - 2, canvas.height - 2);
+
+	for(var i = 0; i < lines.length; i++) {
+		lines[i].show();
+	}
+	for(var i = 0; i < triangles.length; i++) {
+		triangles[i].show();
+	}
+	//console.table(lines);
+}
+
+function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 32: //SPACE BAR
+			for(var i = lines.length - 1; i >= 0; i--) {
+				lines[i].split(lines, triangles);
+				lines.splice(i, 1);
+			}	
+			break;
+	}
+}
+
+function line(x1, y1, x2, y2) {
+	this.x1 = x1;
+	this.y1 = y1;
+	this.x2 = x2;
+	this.y2 = y2;
+	this.angle = Math.atan2((this.y2 - this.y1), (this.x2 - this.x1)) * 180 / Math.PI;
+	this.l = Math.sqrt((this.y2 - this.y1)*(this.y2 - this.y1) + (this.x2 - this.x1)*(this.x2 - this.x1))/3;
+
+	this.show = function() {
+		ctx.fillStyle = "black";
+		ctx.beginPath();
+		ctx.moveTo(this.x1, this.y1);
+		ctx.lineTo(this.x2, this.y2);
+		ctx.stroke();
+	}
+
+	this.split = function(lines, triangles) {
+		xp1 = this.x1 + Math.cos(this.angle * Math.PI / 180) * this.l;
+  		yp1 = this.y1 + Math.sin(this.angle * Math.PI / 180) * this.l;
+		xp3 = this.x1 + Math.cos(this.angle * Math.PI / 180) * 2*this.l;
+  		yp3 = this.y1 + Math.sin(this.angle * Math.PI / 180) * 2*this.l;
+		xp2 = xp1 + Math.cos((-60 + this.angle) * Math.PI / 180) * this.l;
+		yp2 = yp1 + Math.sin((-60 + this.angle) * Math.PI / 180) * this.l;
+		triangles.push(new triangle(xp1, yp1, xp2, yp2, xp3, yp3));
+		lines.push(new line(this.x1, this.y1, xp1, yp1));
+		lines.push(new line(xp1, yp1, xp2, yp2));
+		lines.push(new line(xp2, yp2, xp3, yp3));
+		lines.push(new line(xp3, yp3, this.x2, this.y2));
+	}
+}
+
+function triangle(x1, y1, x2, y2, x3, y3) {
+	this.x1 = x1;
+	this.y1 = y1;
+	this.x2 = x2;
+	this.y2 = y2;
+	this.x3 = x3;
+	this.y3 = y3;
+
+	this.show = function() {
+		ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+		ctx.beginPath();
+	    ctx.moveTo(this.x1, this.y1);
+	    ctx.lineTo(this.x2, this.y2);
+	    ctx.lineTo(this.x3, this.y3);
+	    ctx.lineTo(this.x1, this.y1);
+	    ctx.fill();
+	}	
+}
+
+</script>

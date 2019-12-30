@@ -1,0 +1,352 @@
+
+<title>Demineur</title>
+<!--<link href="./style.css" rel="stylesheet" type="text/css"/>-->
+<link href="./minesweeper.ico" rel="icon"/>
+
+<style type="text/css">
+	canvas {
+	    padding: 0;
+	    margin: auto;
+	    display: block;
+	}
+
+	#setBomb {
+		position: absolute;
+		top: 15;
+		left: 15;
+		width: 170px;
+	}
+
+	#setBombButton {
+		position: absolute;
+		top: 50;
+		left: 15;
+		width: 170px;
+	}
+</style>
+
+<input id="setBomb" type="number" min="1" max="400"/>
+<input id="setBombButton" onclick="setBomb()" type="submit" value="change number of bombs"/>
+<canvas id="next" width="601" height="80" ></canvas>
+<canvas id="screen" width="601" height="601"></canvas>
+<canvas id="score" width="601" height="60"></canvas>
+<div style='display:none;'>
+  <img id="mine" src="./mine.png" width="30" height="30">
+  <img id="flag" src="./flag.png" width="30" height="30">
+</div>
+
+<script type="text/javascript">
+var playGame;
+var canvas, nextCanv, scoreCanv, mine;
+
+grid = [];
+cols = 20;
+rows = 20;
+tileSize = 30;
+pScore = 0;
+nbBomb = 35;
+nbFlag = 0;
+
+mode = 0;
+win = winM = false;
+started = false;
+
+window.onload = function() {
+	canvas = document.getElementById("screen");
+	nextCanv = document.getElementById("next");
+	scoreCanv = document.getElementById("score");
+	inputText = document.getElementById("setBomb");
+	inputBut = document.getElementById("setBombButton");
+	mine = document.getElementById("mine");
+	flag = document.getElementById("flag");
+	ctx = canvas.getContext("2d");
+	ctxN = nextCanv.getContext("2d");
+	ctxS = scoreCanv.getContext("2d");
+	document.addEventListener("keydown", keyPush);
+	canvas.addEventListener("mousedown", mousePressed);
+	playGame = setInterval(game, 1000/15);
+
+	for(var i = 0; i < cols; i++) {
+		grid[i] = [];
+		for(var j = 0; j < rows; j++) {
+			grid[i].push(new cell(i, j));
+		}
+	}
+
+}
+
+function mousePressed(evt) {
+	var border = canvas.getBoundingClientRect();
+	var xCoord = Math.floor((evt.pageX - border.left)/30);
+	var yCoord = Math.floor((evt.pageY - border.top)/30);
+	
+	if(!started) {
+		started = true;
+		inputText.hidden = true;
+		inputBut.hidden = true;
+
+		for(var i = 0; i < nbBomb; i++) {
+			var indexX = Math.floor(Math.random()*cols);
+			var indexY = Math.floor(Math.random()*rows);
+			if(!grid[indexX][indexY].bomb) {
+				grid[indexX][indexY].bomb = true;
+			}
+			else {
+				i--;
+			}
+		}
+
+		for(var i = -1; i <= 1; i++) {
+			for(var j = -1; j <= 1; j++) {
+				if(grid[xCoord+i][yCoord+j].bomb) {
+					grid[xCoord+i][yCoord+j].bomb = false;
+					nbBomb--;
+				}
+			}
+		}
+	}
+	if(mode == 0) {
+		if(!grid[xCoord][yCoord].marked) {
+			grid[xCoord][yCoord].revealed = true;
+		}
+	}
+	else {
+		if(!grid[xCoord][yCoord].revealed) {
+			if(!grid[xCoord][yCoord].marked) {
+				grid[xCoord][yCoord].marked = true;
+				nbFlag++;
+			}
+			else {
+				grid[xCoord][yCoord].marked = false;
+				nbFlag--;
+			}
+		}
+	}
+
+	if(grid[xCoord][yCoord].revealed) {
+		cntF = 0;
+		for(var i = -1; i <= 1; i++) {
+			for(var j = -1; j <= 1; j++) {
+				if(xCoord + i >= 0 && xCoord + i < cols && yCoord + j >= 0 && yCoord + j < rows) {
+					if(grid[xCoord + i][yCoord + j].marked) {
+						cntF++;
+					}
+				}
+			}
+		}
+		if(grid[xCoord][yCoord].neighbour == cntF) {
+			for(var i = -1; i <= 1; i++) {
+				for(var j = -1; j <= 1; j++) {
+					if(xCoord + i >= 0 && xCoord + i < cols && yCoord + j >= 0 && yCoord + j < rows) {
+						if(!grid[xCoord + i][yCoord + j].marked) {
+							grid[xCoord + i][yCoord + j].revealed = true;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+function setBomb() {
+	if(!started) {
+		nbBomb = inputText.value;
+
+		for(var i = 0; i < cols; i++) {
+			for(var j = 0; j < rows; j++) {
+				grid[i][j].bomb = false;
+			}
+		}
+
+		for(var i = 0; i < nbBomb; i++) {
+			var indexX = Math.floor(Math.random()*cols);
+			var indexY = Math.floor(Math.random()*rows);
+			if(!grid[indexX][indexY].bomb) {
+				grid[indexX][indexY].bomb = true;
+			}
+			else {
+				i--;
+			}
+		}
+	}
+}
+
+function game() {
+	//backgrounds
+	ctx.fillStyle = "gray";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	ctxN.fillStyle = "white";
+	ctxN.fillRect(0, 0, nextCanv.width, nextCanv.height);
+
+	ctxS.fillStyle = "white";
+	ctxS.fillRect(0, 0, scoreCanv.width, scoreCanv.height);
+
+	win = true;
+	winM = true;
+
+	if(mode > 1) {
+		mode = 0;
+	}
+	ctxN.font = "bold 35px Arial";
+	ctxN.textAlign = "center";
+	if(mode == 0) {
+		ctxN.fillStyle = "black";
+		ctxN.fillText("Search mode", nextCanv.width/2, nextCanv.height*3/4);
+	}
+	else{
+		ctxN.fillStyle = "red";
+		ctxN.fillText("Flag mode", nextCanv.width/2, nextCanv.height*3/4);
+	}
+
+	ctxS.font = "bold 35px Arial";
+	ctxS.textAlign = "center";
+	ctxS.fillStyle = "black";
+	ctxS.fillText("Bombs left: " + (nbBomb - nbFlag), scoreCanv.width/2, scoreCanv.height*3/4);
+
+	for(var i = 0; i < cols; i++) {
+		for(var j = 0; j < rows; j++) {
+			grid[i][j].checkAround(grid);
+		}
+	}
+
+	//grille de jeu
+	for(var i = 0; i < cols; i++) {
+		for(var j = 0; j < rows; j++) {
+			grid[i][j].show();
+			grid[i][j].update(grid);
+
+			if(!grid[i][j].revealed && !grid[i][j].bomb) {
+				win = false;
+			}
+
+			if((grid[i][j].bomb && !grid[i][j].marked) || (!grid[i][j].bomb && grid[i][j].marked)) {
+				winM = false;
+			}
+
+		}
+	}
+
+	if(mode == 1) {
+		ctx.strokeStyle = "red";
+		ctx.lineWidth = 5;
+		ctx.strokeRect(0, 0, canvas.width, canvas.height);
+	}
+
+	if((win || winM) && started) {
+		gameOver(1);
+	}
+
+}
+
+function gameOver(win) {
+	ctxN.fillStyle = "white";
+	ctxN.fillRect(0, 0, nextCanv.width, nextCanv.height);
+	ctxN.font = "bold 55px Arial";
+	ctxN.textAlign = "center";
+	ctxN.fillStyle = "red";
+	if(win == 1) {
+		ctxN.fillText("VICTORY", nextCanv.width/2, nextCanv.height*3/4);
+	}
+	else {
+		ctxN.fillText("GAME OVER", nextCanv.width/2, nextCanv.height*3/4);
+		for(var i = 0; i < cols; i++) {
+			for(var j = 0; j < rows; j++) {
+				if(grid[i][j].bomb) {
+					grid[i][j].revealed = true;
+				}
+			}
+		}
+	}
+	clearInterval(playGame);
+
+}
+
+function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 32: //SPACE
+			mode++;
+			break;
+
+		case 37: //LEFT
+			break;
+
+		case 38: //UP
+			break;
+
+		case 39: //RIGHT
+			break;
+
+		case 40:  //DOWN
+			break;
+	}
+}
+
+function cell(i, j) {
+	this.w = tileSize;
+	this.x = i * this.w;
+	this.y = j * this.w;
+	this.neighbour = 0;
+	this.revealed = false;
+	this.bomb = false;
+	this.marked = false;
+
+	this.show = function() {
+		if(this.revealed){
+			ctx.fillStyle = "#ddd";
+			ctx.fillRect(this.x + 1, this.y + 1, this.w - 1, this.w - 1);
+			if(this.bomb){
+				ctx.drawImage(mine, this.x + 4, this.y + 4, this.w - 7, this.w - 7);
+			}
+			else if (this.neighbour != 0) {
+				ctx.fillStyle = "black";
+				ctx.font = "bold 25px Arial";
+				ctx.textAlign = "center";
+				ctx.fillText(this.neighbour, this.x + this.w/2 + 1, this.y + this.w/2 + 10);
+			}
+		}
+		else {
+			ctx.fillStyle = "white";
+			ctx.fillRect(this.x + 1, this.y + 1, this.w - 1, this.w - 1);
+			if(this.marked) {
+				ctx.drawImage(flag, this.x + 1, this.y + 1, this.w - 2, this.w - 2);
+			}
+		}
+	}
+
+	this.update = function(grid) {
+		if(this.revealed) {
+			//case sans bombes voisines
+			if(!this.bomb && this.neighbour == 0) {
+				for(var i = -1; i <= 1; i++) {
+					for(var j = -1; j <= 1; j++) {
+						if(i+(this.x/this.w) >= 0 && i+(this.x/this.w) < cols && j+(this.y/this.w) >= 0 && j+(this.y/this.w) < rows) {
+							if(!grid[i+(this.x/this.w)][j+(this.y/this.w)].revealed) {
+								grid[i+(this.x/this.w)][j+(this.y/this.w)].revealed = true;
+							}
+						}
+					}
+				}
+			}
+			//case bombe
+			if(this.bomb) {
+				gameOver(0);
+			}
+		}
+	}
+
+	this.checkAround = function(grid) {
+		neighbour = 0;
+		for(var i = -1; i <= 1; i++) {
+			for(var j = -1; j <= 1; j++) {
+				if(i+(this.x/this.w) >= 0 && i+(this.x/this.w) < cols && j+(this.y/this.w) >= 0 && j+(this.y/this.w) < rows) {
+					if(grid[i+(this.x/this.w)][j+(this.y/this.w)].bomb) {
+						neighbour++;
+					}
+				}
+			}
+		}
+		this.neighbour = neighbour;
+	}
+}
+</script>

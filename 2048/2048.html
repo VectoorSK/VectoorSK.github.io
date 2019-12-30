@@ -1,0 +1,388 @@
+<title>2048</title>
+<!--<link href="./style.css" rel="stylesheet" type="text/css"/>-->
+<link href="./2048.ico" rel="icon"/>
+
+<style type="text/css">
+	canvas {
+	    padding: 0;
+	    margin: auto;
+	    display: block;
+	}
+</style>
+
+<canvas id="score" width="401" height="80" ></canvas>
+<canvas id="screen" width="601" height="601"></canvas>
+<div style='display:none;'>
+
+</div>
+
+<script type="text/javascript">
+var playGame;
+var canvas, scoreCanv, mine;
+
+colors = ["#eee4db", "#eedfc8", "#f2b179", "#ec8d55", "#f77b5f", "#ea5a38", "#edcf72", "#f2d04b", "#e0b951", "#e3ba14", "#ecc402", "#60d992", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd", "#ddd"];
+
+grid = [];
+cols = 4;
+rows = 4;
+tileSize = 150;
+score = 0;
+
+
+window.onload = function() {
+	canvas = document.getElementById("screen");
+	scoreCanv = document.getElementById("score");
+	ctx = canvas.getContext("2d");
+	ctxS = scoreCanv.getContext("2d");
+	document.addEventListener("keydown", keyPush);
+	playGame = setInterval(game, 1000/15);
+
+	for(var i = 0; i < cols; i++) {
+		grid[i] = [];
+		for(var j = 0; j < rows; j++) {
+			grid[i].push(new cell(i, j, 0));
+		}
+	}
+	full = false, blocked = false;
+	spawnBloc();
+}
+
+function game() {
+	//backgrounds
+	ctx.fillStyle = "gray";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	ctxS.fillStyle = "white";
+	ctxS.fillRect(0, 0, scoreCanv.width, scoreCanv.height);
+	ctxS.fillStyle = "black";
+	ctxS.font = "bold 40px Arial";
+	ctxS.textAlign = "center";
+	ctxS.fillText("SCORE: " + score, scoreCanv.width/2, scoreCanv.height*3/4);
+
+	//grille de jeu
+	full = true;
+	for(var i = 0; i < cols; i++) {
+		for(var j = 0; j < rows; j++) {
+			grid[i][j].show();
+			if(grid[i][j].value == 2048) {
+				gameOver(1);
+			}
+			if(!grid[i][j].set) {
+				full = false;
+			}
+		}
+	}
+
+	if(full) {
+		blocked = true;
+		for(var i = 0; i < cols; i++) {
+			for(var j = 0; j < rows; j++) {
+				if(grid[i][j].canMove(grid)) {
+					blocked = false;
+				}
+			}
+		}
+	}
+
+	if(blocked) {
+		gameOver(0);
+	}
+
+}
+
+function gameOver(win) {
+	ctxS.fillStyle = "white";
+	ctxS.fillRect(0, 0, scoreCanv.width, scoreCanv.height);
+	ctxS.font = "bold 55px Arial";
+	ctxS.textAlign = "center";
+	ctxS.fillStyle = "red";
+	if(win == 1) {
+		ctxS.fillText("VICTORY", scoreCanv.width/2, scoreCanv.height*3/4);
+	}
+	else {
+		ctxS.fillText("GAME OVER", scoreCanv.width/2, scoreCanv.height*3/4);
+		clearInterval(playGame);
+	}
+}
+
+function spawnBloc() {
+	full = true;
+	for(var i = 0; i < cols; i++) {
+		for(var j = 0; j < rows; j++) {
+			if(!grid[i][j].set) {
+				full = false;
+			}
+		}
+	}
+	if(!full) {
+		do {
+			randI = Math.floor(Math.random()*cols);
+			randJ = Math.floor(Math.random()*rows);
+		} while(grid[randI][randJ].set);
+		if(Math.random() < 0.9) {
+			grid[randI][randJ].setValue(2);
+		}
+		else {
+			grid[randI][randJ].setValue(4);
+		}
+	}
+}
+
+function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 32: //SPACE
+			spawnBloc();
+			break;
+
+		case 38: //UP
+			moved = false;
+			for(var i = 0; i < cols; i++) {
+				for(var j = 0; j < rows; j++) {
+					grid[i][j].stop = false;
+				}
+			}
+			for(var k = 0; k < rows; k++) {
+				for(var i = 0; i < cols; i++) {
+					for(var j = 0; j < rows; j++) {
+						if(grid[i][j].up(grid)) {
+							moved = true;
+						}
+					}
+				}
+			}
+			if(moved) {
+				spawnBloc();
+			}
+			break;
+
+		case 40:  //DOWN
+			moved = false;
+			for(var i = 0; i < cols; i++) {
+				for(var j = 0; j < rows; j++) {
+					grid[i][j].stop = false;
+				}
+			}
+			for(var k = 0; k < rows; k++) {
+				for(var i = 0; i < cols; i++) {
+					for(var j = rows - 1; j >= 0; j--) {
+						if(grid[i][j].down(grid)) {
+							moved = true;
+						}
+					}
+				}
+			}
+			if(moved) {
+				spawnBloc();
+			}
+			break;
+
+		case 37: //LEFT
+			moved = false;
+			for(var i = 0; i < cols; i++) {
+				for(var j = 0; j < rows; j++) {
+					grid[i][j].stop = false;
+				}
+			}
+			for(var k = 0; k < cols; k++) {
+				for(var i = 0; i < cols; i++) {
+					for(var j = 0; j < rows; j++) {
+						if(grid[i][j].left(grid)) {
+							moved = true;
+						}
+					}
+				}
+			}
+			if(moved) {
+				spawnBloc();
+			}
+			break;
+
+		case 39: //RIGHT
+			moved = false;
+			for(var i = 0; i < cols; i++) {
+				for(var j = 0; j < rows; j++) {
+					grid[i][j].stop = false;
+				}
+			}
+			for(var k = 0; k < cols; k++) {
+				for(var i = cols - 1; i >= 0; i--) {
+					for(var j = 0; j < rows; j++) {
+						if(grid[i][j].right(grid)) {
+							moved = true;
+						}
+					}
+				}
+			}
+			if(moved) {
+				spawnBloc();
+			}
+			break;
+	}
+}
+
+function cell(i, j, value) {
+	this.w = tileSize;
+	this.x = i * this.w;
+	this.y = j * this.w;
+	this.value = value;
+	this.stop = false;
+	if(this.value > 0) {
+		this.set = true;
+		this.c = colors[Math.log2(value)-1];
+	}
+	else {
+		this.set = false;
+		this.c = "white";
+	}
+
+	this.show = function() {
+		ctx.fillStyle = this.c;
+		ctx.fillRect(this.x + 1, this.y + 1, this.w - 1, this.w - 1);
+
+		if(this.set) {
+			ctx.fillStyle = "black";
+			ctx.font = "bold 35px Arial";
+			ctx.textAlign = "center";
+			ctx.fillText(this.value, this.x + this.w/2 + 1, this.y + this.w/2 + 10);
+		}
+	}
+
+	this.setValue = function(value) {
+		this.value = value;
+		if(this.value > 0) {
+			this.set = true;
+			this.c = colors[Math.log2(value)-1];
+		}
+		else {
+			this.set = false;
+			this.c = "white";
+		}
+	}
+
+	this.iCoord = function() {
+		return this.x/this.w;
+	}
+
+	this.jCoord = function() {
+		return this.y/this.w;
+	}
+
+	this.up = function(cells) {
+		if(this.set) {
+			if(this.jCoord() -1 >= 0) {
+				if(!grid[this.iCoord()][this.jCoord() - 1].set) {
+					grid[this.iCoord()][this.jCoord() - 1].setValue(this.value);
+					this.setValue(0);
+					return true;
+				}
+				else if(this.value == grid[this.iCoord()][this.jCoord() - 1].value && !this.stop) {
+					grid[this.iCoord()][this.jCoord() - 1].setValue(2*this.value);
+					score += 2*this.value;
+					this.setValue(0);
+					for(var j = 0; j < rows; j++) {
+						grid[this.iCoord()][j].stop = true;
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	this.down = function(cells) {
+		if(this.set) {
+			if(this.jCoord() + 1 < rows) {
+				if(!grid[this.iCoord()][this.jCoord() + 1].set) {
+					grid[this.iCoord()][this.jCoord() + 1].setValue(this.value);
+					this.setValue(0);
+					return true;
+				}
+				else if(this.value == grid[this.iCoord()][this.jCoord() + 1].value && !this.stop) {
+					grid[this.iCoord()][this.jCoord() + 1].setValue(2*this.value);
+					score += 2*this.value;
+					this.setValue(0);
+					for(var j = 0; j < rows; j++) {
+						grid[this.iCoord()][j].stop = true;
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	this.left = function(grid) {
+		if(this.set) {
+			if(this.iCoord() - 1 >= 0) {
+				if(!grid[this.iCoord() - 1][this.jCoord()].set) {
+					grid[this.iCoord() - 1][this.jCoord()].setValue(this.value);
+					this.setValue(0);
+					return true;
+				}
+				else if(this.value == grid[this.iCoord() - 1][this.jCoord()].value && !this.stop) {
+					grid[this.iCoord() - 1][this.jCoord()].setValue(2*this.value);
+					score += 2*this.value;
+					this.setValue(0);
+					for(var i = 0; i < cols; i++) {
+						grid[i][this.jCoord()].stop = true;
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	this.right = function(grid) {
+		if(this.set) {
+			if(this.iCoord() + 1 < cols) {
+				if(!grid[this.iCoord() + 1][this.jCoord()].set) {
+					grid[this.iCoord() + 1][this.jCoord()].setValue(this.value);
+					this.setValue(0);
+					return true;
+				}
+				else if(this.value == grid[this.iCoord() + 1][this.jCoord()].value && !this.stop) {
+					grid[this.iCoord() + 1][this.jCoord()].setValue(2*this.value);
+					score += 2*this.value;
+					this.setValue(0);
+					for(var i = 0; i < cols; i++) {
+						grid[i][this.jCoord()].stop = true;
+					}
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	this.canMove = function(grid) {
+		//up
+		if(this.jCoord() - 1 >= 0) {
+			if(!grid[this.iCoord()][this.jCoord() - 1].set) {
+				if(this.value == grid[this.iCoord()][this.jCoord() - 1].value) {
+					return true;
+				}
+			}
+		}
+		//down
+		if(this.jCoord() + 1 < rows) {
+			if(!grid[this.iCoord()][this.jCoord() + 1].set || this.value == grid[this.iCoord()][this.jCoord() + 1].value) {
+				return true;
+			}
+		}
+		//left
+		if(this.iCoord() - 1 >= 0) {
+			if(!grid[this.iCoord() - 1][this.jCoord()].set || this.value == grid[this.iCoord() - 1][this.jCoord()].value) {
+				return true;
+			}
+		}
+		//right
+		if(this.iCoord() + 1 < cols) {
+			if(!grid[this.iCoord() + 1][this.jCoord()].set || this.value == grid[this.iCoord() + 1][this.jCoord()].value) {
+				return true;
+			}
+		}
+		return false;
+	}
+}
+</script>

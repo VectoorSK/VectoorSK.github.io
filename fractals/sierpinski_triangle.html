@@ -1,0 +1,93 @@
+
+<title>Sierpinski Triangle</title>
+<!--<link href="./style.css" rel="stylesheet" type="text/css"/>-->
+<link href="" rel="icon"/>
+
+<style type="text/css">
+	canvas {
+	    margin: auto;
+	    display: block;
+	}
+</style>
+
+<canvas id="screen" width="600" height="600"></canvas>
+
+<script type="text/javascript">
+var playGame;
+var canvas;
+
+triangles = [];
+
+window.onload = function() {
+	canvas = document.getElementById("screen");
+	ctx = canvas.getContext("2d");
+	document.addEventListener("keydown", keyPush);
+	playGame = setInterval(game, 1000);
+
+	indexMin = 0;
+
+	triangles.push(new triangle(canvas.width/2, 10, 500));
+}
+
+function game() {
+	//backgrounds
+	ctx.fillStyle = "white";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	for(var i = 0; i < triangles.length; i++) {
+		triangles[i].show();
+	}
+	console.table(triangles);
+}
+
+function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 32: //SPACE BAR
+			var temp = 1;
+			for(var i = triangles.length-1; i >= indexMin; i--) {
+				triangles[i].split(triangles);
+				if(temp%3 == 0) {
+					indexMin++;
+				}
+				temp++;
+			}
+			break;
+	}
+}
+
+
+function triangle(x, y, w) {
+	this.x = x;
+	this.y = y;
+	this.w = w;
+	angleX1 = Math.cos(60 * Math.PI / 180);
+	angleY1 = Math.sin(60 * Math.PI / 180);
+	angleX2 = Math.cos(120 * Math.PI / 180);
+	angleY2 = Math.sin(120 * Math.PI / 180);
+
+	this.show = function() {
+		ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
+		ctx.beginPath();
+		ctx.moveTo(this.x, this.y);
+		ctx.lineTo(this.x + angleX1*this.w, this.y + angleY1*this.w);
+		ctx.lineTo(this.x + angleX2*this.w, this.y + angleY2*this.w);
+		ctx.lineTo(this.x, this.y);
+		ctx.fill();
+
+		ctx.fillStyle = "white";
+		ctx.beginPath();
+		ctx.moveTo(this.x + angleX1*this.w/2, this.y + angleY1*this.w/2);
+		ctx.lineTo(this.x + angleX2*this.w/2, this.y + angleY2*this.w/2);
+		ctx.lineTo((this.x + angleX2*this.w/2) + angleX1*this.w/2, (this.y + angleY2*this.w/2) + angleY1*this.w/2);
+		ctx.lineTo(this.x + angleX1*this.w/2, this.y + angleY1*this.w/2);
+		ctx.fill();
+	}
+
+	this.split = function(triangles) {
+		triangles.push(new triangle(this.x, this.y, this.w/2));
+		triangles.push(new triangle(this.x + angleX1*this.w/2, this.y + angleY1*this.w/2, this.w/2));
+		triangles.push(new triangle(this.x + angleX2*this.w/2, this.y + angleY2*this.w/2, this.w/2));
+	}
+}
+
+</script>

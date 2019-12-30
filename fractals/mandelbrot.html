@@ -1,0 +1,47 @@
+
+<title>Mandelbrot</title>
+<!--<link href="./style.css" rel="stylesheet" type="text/css"/>-->
+<link href="" rel="icon"/>
+
+<style type="text/css">
+	canvas {
+	    margin: auto;
+	    display: block;
+	}
+</style>
+
+<canvas id="screen" width="700" height="500"></canvas>
+
+<script type="text/javascript">
+var playGame;
+var canvas;
+
+lines = [];
+squares = [];
+
+window.onload = function() {
+	canvas = document.getElementById("screen");
+	ctx = canvas.getContext("2d");
+	document.addEventListener("keydown", keyPush);
+	playGame = setInterval(game, 1000/60);
+
+	ctx.fillStyle = "gray";
+	for(var x = 0; x < canvas.width; x++) {
+		for(var y = 0; y < canvas.height; y++) {
+			ctx.fillRect(x, y, 1 , 1);
+		}
+	}
+}
+
+function game() {
+	//backgrounds
+}
+
+function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 32: //SPACE BAR
+			break;
+	}
+}
+
+</script>

@@ -1,0 +1,92 @@
+
+<title>Sierpinski Square</title>
+<!--<link href="./style.css" rel="stylesheet" type="text/css"/>-->
+<link href="" rel="icon"/>
+
+<style type="text/css">
+	canvas {
+	    margin: auto;
+	    display: block;
+	}
+</style>
+
+<canvas id="screen" width="600" height="600"></canvas>
+
+<script type="text/javascript">
+var playGame;
+var canvas;
+
+squares = [];
+
+window.onload = function() {
+	canvas = document.getElementById("screen");
+	ctx = canvas.getContext("2d");
+	document.addEventListener("keydown", keyPush);
+	playGame = setInterval(game, 1000);
+
+	indexMin = 0;
+
+	squares.push(new square(0, 0, canvas.width));
+}
+
+function game() {
+	//backgrounds
+	ctx.fillStyle = "black";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+	ctx.fillStyle = "white";
+	ctx.fillRect(1, 1, canvas.width - 2, canvas.height - 2);
+
+	for(var i = 0; i < squares.length; i++) {
+		squares[i].show();
+	}
+}
+
+function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 32: //SPACE BAR
+			var temp = 1;
+			for(var i = squares.length-1; i >= indexMin; i--) {
+				squares[i].split(squares);
+				if(temp%8 == 0) {
+					indexMin++;
+				}
+				temp++;
+			}
+			break;
+	}
+}
+
+
+function square(x, y, w) {
+	this.x = x;
+	this.y = y;
+	this.w = w;
+	this.subsquare = [[0,0,0], [0,1,0], [0,0,0]];
+
+	this.show = function() {
+		for(var i = 0; i < 3; i++) {
+			for(var j = 0; j < 3; j++) {
+				if(this.subsquare[i][j] == 0) {
+					ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
+					ctx.fillRect(this.x + i*this.w/3, this.y + j*this.w/3, this.w/3, this.w/3);
+				}
+				else {
+					ctx.fillStyle = "white";
+				}
+				ctx.fillRect(this.x + i*this.w/3, this.y + j*this.w/3, this.w/3, this.w/3);
+			}
+		}
+	}
+
+	this.split = function(squares) {
+		for(var i = 0; i < 3; i++) {
+			for(var j = 0; j < 3; j++) {
+				if(this.subsquare[i][j] == 0) {
+					squares.push(new square(this.x + i*this.w/3, this.y + j*this.w/3, this.w/3));
+				}
+			}
+		}
+	}
+}
+
+</script>

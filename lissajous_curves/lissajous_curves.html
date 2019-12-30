@@ -1,0 +1,151 @@
+<title>Lissajous Curves</title>
+<link rel="icon" href="./lissajous.ico"/>
+
+<style type="text/css">
+	canvas {
+		display: block;
+		margin: 0 auto;
+	}
+</style>
+
+<canvas id="screen" width="800" height="640"></canvas>
+
+<script type="text/javascript">
+
+var game, canvas, cols, rows, size, angle, temp = 0;
+var framerate = 60;
+var grid = [];
+
+window.onload = function() {
+	canvas = document.getElementById("screen");
+	ctx = canvas.getContext("2d");
+	document.addEventListener("keydown", keyPress);
+	game = setInterval(draw, 1000/framerate);
+
+	angleX = 0;
+	angleY = 0;
+	size = 80;
+	cols = canvas.width / size - 1;
+	rows = canvas.height / size - 1;
+
+	for(var i = 0; i < cols; i++) {
+		grid[i] = [];
+		for(var j = 0; j < rows; j++) {
+			grid[i][j] = new shape(i, j);
+		}
+	}
+}
+
+function draw() {
+	ctx.fillStyle = "white";
+	ctx.fillRect(0, 0, canvas.width, size);
+	ctx.fillRect(0, 0, size, canvas.height);
+	//ctx.fillStyle = "rgba(255, 255, 255, 0.005)";
+	//ctx.fillRect(size, size, canvas.width - size, canvas.height - size);
+
+	temp++;
+	if(temp > 40) {
+		temp = 0;
+		ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+		ctx.fillRect(size, size, canvas.width - size, canvas.height - size);
+	}
+	for(i = 0; i < cols; i++) {
+		x = (i+1)*size + size/2;
+		y = size/2;
+		r = size - 10;
+		ctx.strokeStyle = "lightblue";
+		ctx.strokeStyle = 'rgb(' + Math.floor(255/cols * i) + ', 50 ,50)';
+		ctx.lineWeight = 2;
+		ctx.beginPath();
+		ctx.arc(x, y, r/2, 0, 2*Math.PI, false);
+		ctx.stroke();
+
+		px = r/2*Math.cos((i+1)*angleX - Math.PI/2) + x;
+		py = r/2*Math.sin((i+1)*angleX - Math.PI/2) + y;
+		ctx.fillStyle = "lightblue";
+		ctx.fillStyle = 'rgb(' + Math.floor(255/cols * i) + ', 50, 50)';
+		ctx.beginPath();
+		ctx.arc(px, py, 3, 0, 2*Math.PI, false);
+		ctx.fill();
+
+		/*ctx.lineWeight = 1;
+		ctx.beginPath();
+		ctx.moveTo(px, 0);
+		ctx.lineTo(px, canvas.height);
+		ctx.stroke();*/
+
+		for(j = 0; j < rows; j++) {
+			grid[i][j].setCurX(px);
+		}
+	}
+
+	for(i = 0; i < rows; i++) {
+		x = size/2;
+		y = (i+1)*size + size/2;
+		r = size - 10;
+		ctx.strokeStyle = "lightblue";
+		ctx.strokeStyle = 'rgb(50, ' + Math.floor(255/rows * i) + ', 50)';
+		ctx.lineWeight = 2;
+		ctx.beginPath();
+		ctx.arc(x, y, r/2, 0, 2*Math.PI, false);
+		ctx.stroke();
+
+		px = r/2*Math.cos((i+1)*angleY - Math.PI/2) + x;
+		py = r/2*Math.sin((i+1)*angleY - Math.PI/2) + y;
+		ctx.fillStyle = "lightblue";
+		ctx.fillStyle = 'rgb(50, ' + Math.floor(255/rows * i) + ', 50)';
+		ctx.beginPath();
+		ctx.arc(px, py, 3, 0, 2*Math.PI, false);
+		ctx.fill();
+
+		/*ctx.lineWeight = 1;
+		ctx.beginPath();
+		ctx.moveTo(0, py);
+		ctx.lineTo(canvas.width, py);
+		ctx.stroke();*/
+
+		for(j = 0; j < cols; j++) {
+			grid[j][i].setCurY(py);
+		}
+	}
+
+	for(var i = 0; i < cols; i++) {
+		for(var j = 0; j < rows; j++) {
+			grid[i][j].show();
+		}
+	}
+
+	angleX += 0.01;
+	angleY += 0.01;
+}
+
+function keyPress(evt) {
+	switch(evt.keyCode) {
+		case 32:
+			break;
+	}
+}
+
+function shape(i, j) {
+	this.cx = (i+1) * size + size/2;
+	this.cy = (j+1) * size + size/2;
+
+	this.show = function() {
+		ctx.fillStyle = 'rgb(' + Math.floor(255/cols * i) + ',' + Math.floor(255/rows * j) + ',75)';
+		console.log(i);
+		ctx.beginPath();
+		ctx.arc(this.cx, this.cy, 2, 0, 2*Math.PI, false);
+		ctx.fill();
+	}
+
+	this.setCurX = function(cx) {
+		this.cx = cx;
+	}
+
+	this.setCurY = function(cy) {
+		this.cy = cy;
+	}
+}
+
+</script>
+

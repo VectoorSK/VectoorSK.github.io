@@ -1,0 +1,211 @@
+
+<title>Tic Tac Toe</title>
+<link href="./tic_tac_toe.ico" rel="icon"/>
+
+<style type="text/css">
+	canvas {
+	    margin: auto;
+	    display: block;
+	}
+</style>
+
+<canvas id="gameCanvas" width="376" height="376" style="margin: 0 auto;"></canvas>
+<canvas id="gameScore" width="376" height="75" style="margin: 0 auto;"></canvas>
+
+<script type="text/javascript">
+var playGame;
+var canvas;
+
+window.onload = function() {
+	canvas = document.getElementById("gameCanvas");
+	canvasScore = document.getElementById("gameScore");
+	ctx = canvas.getContext("2d");
+	ctx2 = canvasScore.getContext("2d");
+	document.addEventListener("keydown", keyPush);
+	playGame = setInterval(game, 1000/15);
+
+	for(var i = 0; i < 3; i++) {
+		for(var j = 0; j < 3; j++) {
+			grid[i].push({x:i*gridSize, y:j*gridSize, c:0});
+		}
+	}
+}
+
+xPos = yPos = 1;
+
+grid = [[],[],[]];
+gridSize = 125;
+
+currentPlayer = 1;
+
+function game() {
+	//background
+	ctx.fillStyle = "black";
+	ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+	//grille de jeu
+	for(var i = 0; i < 3; i++) {
+		for(var j = 0; j < 3; j++) {
+			ctx.fillStyle = "white";
+			ctx.fillRect(grid[i][j].x + 1, grid[i][j].y + 1, gridSize - 1, gridSize - 1);
+
+			if(grid[i][j].c == 1) {
+				ctx.strokeStyle = "black";
+				ctx.lineWidth = 5;
+				ctx.beginPath();
+				ctx.moveTo(grid[i][j].x + 16 , grid[i][j].y + 16);
+				ctx.lineTo(grid[i][j].x + 106, grid[i][j].y + 106);
+				ctx.moveTo(grid[i][j].x + 16 , grid[i][j].y + 106);
+				ctx.lineTo(grid[i][j].x + 106, grid[i][j].y + 16);
+				ctx.stroke();
+			}
+			else if(grid[i][j].c == 2) {
+				ctx.strokeStyle = "black";
+				ctx.lineWidth = 5;
+				ctx.beginPath();
+				ctx.arc(grid[i][j].x + gridSize/2, grid[i][j].y + gridSize/2, gridSize/2 - 15, 0, 2*Math.PI, false);
+				ctx.stroke();
+			}
+		}
+	}
+
+	//affichage du tour
+	ctx2.fillStyle = "white";
+	ctx2.fillRect(0, 0, canvasScore.width, canvasScore.height);
+	ctx2.fillStyle = "black";
+	ctx2.font = "bold 30px Arial";
+	ctx2.textAlign = "center";
+	if(currentPlayer == 1) {
+		ctx2.fillText("CROSS TURN", canvasScore.width/2, 30);
+	}
+	else {
+		ctx2.fillText("CIRCLE TURN", canvasScore.width/2, 30);
+	}
+
+	//Gestion du joueur
+	ctx.strokeStyle = "grey";
+	ctx.lineWidth = 3;
+	ctx.strokeRect(xPos * gridSize + 1, yPos * gridSize + 1, gridSize - 1, gridSize - 1);
+
+	if(xPos < 0) {
+		xPos = 0;
+	}
+	if(xPos > 2) {
+		xPos = 2;
+	}
+	if(yPos < 0) {
+		yPos = 0;
+	}
+	if(yPos > 2) {
+		yPos = 2;
+	}
+
+	if(currentPlayer > 2) {
+		currentPlayer = 1;
+	}
+
+	//egalité
+	equality = true;
+	for(var i = 0; i < 3; i++) {
+		for(var j = 0; j < 3; j++) {
+			if(grid[i][j].c == 0) {
+				equality = false
+			}
+		}
+	}
+	if(equality) {
+		gameOver(0);
+	}
+
+	//condition de victoire
+	for(var i = 0; i < 3; i++) {
+		if(grid[i][0].c == grid[i][1].c && grid[i][1].c == grid[i][2].c && grid[i][0].c != 0) {
+			gameOver(grid[i][0].c);
+			ctx.strokeStyle = "red";
+			ctx.lineWidth = 6;
+			ctx.beginPath();
+			ctx.moveTo(grid[i][0].x + gridSize/2 - 1, grid[i][0].y + gridSize/2 - 20);
+			ctx.lineTo(grid[i][2].x + gridSize/2 - 1, grid[i][2].y + gridSize/2 + 20);
+			ctx.stroke();
+			clearInterval(playGame);
+		}
+		if(grid[0][i].c == grid[1][i].c && grid[1][i].c == grid[2][i].c && grid[0][i].c != 0) {
+			gameOver(grid[0][i].c);
+			ctx.strokeStyle = "red";
+			ctx.lineWidth = 6;
+			ctx.beginPath();
+			ctx.moveTo(grid[0][i].x + gridSize/2 - 20, grid[0][i].y + gridSize/2 - 1);
+			ctx.lineTo(grid[2][i].x + gridSize/2 + 20, grid[2][i].y + gridSize/2 - 1);
+			ctx.stroke();
+			clearInterval(playGame);
+		}
+	}
+	if(grid[0][0].c == grid[1][1].c && grid[1][1].c == grid[2][2].c && grid[1][1].c != 0) {
+		gameOver(grid[1][1].c);
+		ctx.strokeStyle = "red";
+		ctx.lineWidth = 6;
+		ctx.beginPath();
+		ctx.moveTo(grid[0][0].x + gridSize/2 - 1.5, grid[0][0].y + gridSize/2 - 1.5);
+		ctx.lineTo(grid[2][2].x + gridSize/2 - 1.5, grid[2][2].y + gridSize/2 - 1.5);
+		ctx.stroke();
+		clearInterval(playGame);
+	}
+	if(grid[2][0].c == grid[1][1].c && grid[1][1].c == grid[0][2].c && grid[1][1].c != 0) {
+		gameOver(grid[1][1].c);
+		ctx.strokeStyle = "red";
+		ctx.lineWidth = 6;
+		ctx.beginPath();
+		ctx.moveTo(grid[2][0].x + gridSize/2 - 1.5, grid[2][0].y + gridSize/2 - 1.5);
+		ctx.lineTo(grid[0][2].x + gridSize/2 - 1.5, grid[0][2].y + gridSize/2 - 1.5);
+		ctx.stroke();
+		clearInterval(playGame);''
+	}
+
+}
+
+function gameOver(player) {
+	ctx2.fillStyle = "white";
+	ctx2.fillRect(0, 0, canvasScore.width, canvasScore.height);
+	ctx2.font = "bold 30px Arial";
+	ctx2.textAlign = "center";
+	ctx2.fillStyle = "black";
+	if(player == 1) {
+		ctx2.fillText("CROSS VICTORY", canvasScore.width/2, 30);
+	}
+	else if (player == 2) {
+		ctx2.fillText("CIRCLE VICTORY", canvasScore.width/2, 30);
+	}
+	else {
+		ctx2.fillText("DRAW", canvasScore.width/2, 30);
+	}
+	ctx2.font = "20px Arial";
+	ctx2.fillText("Reload the page to play again.", canvasScore.width/2, canvasScore.height/2+20);
+}
+
+function keyPush(evt) {
+	switch(evt.keyCode) {
+		case 37: //LEFT
+			xPos -= 1;
+			break;
+
+		case 38: //UP
+			yPos -= 1;
+			break;
+
+		case 39: //RIGHT
+			xPos += 1;
+			break;
+
+		case 40: //DOWN
+			yPos += 1;
+			break;
+
+		case 32: //SPACE BAR
+			if(grid[xPos][yPos].c == 0) {
+				grid[xPos][yPos].c = currentPlayer;
+				currentPlayer++;
+			}
+			break;
+	}
+}
+</script>

@@ -74,7 +74,8 @@ space = place a circle/cross
 
 ***
 ## 2048
-![2048](https://user-images.githubusercontent.com/48760638/71596450-d2ee7b80-2b3f-11ea-81d8-d45e9cb71115.png)
+![2048](https://user-images.githubusercontent.com/48760638/71597515-bfddaa80-2b43-11ea-83d2-d75c0d076e40.png)
+
 `...`
 
 ...

@@ -2,7 +2,8 @@
 Compilation of game remake made in JavaScript
 
 ## PONG:
-![pong](https://user-images.githubusercontent.com/48760638/71596462-d41fa880-2b3f-11ea-822c-f05e6823e73d.png)
+![pong](https://user-images.githubusercontent.com/48760638/71597648-45f9f100-2b44-11ea-82e0-95abf867f49a.png)
+
 `[2 Players] Move the bar to block the ball. Score 3 points to win`
 
 [Z][S] = move player 1
@@ -10,7 +11,8 @@ Compilation of game remake made in JavaScript
 
 ***
 ## BREAKOUT:
-![breakout](https://user-images.githubusercontent.com/48760638/71596453-d2ee7b80-2b3f-11ea-9a59-85782cac6c8e.png)
+![breakout](https://user-images.githubusercontent.com/48760638/71597641-45615a80-2b44-11ea-83cc-a49954a2e170.png)
+
 `[1 Player] Destroy every bricks without losing the ball (5 lifes)`
 
 ⬅️➡️ = move
@@ -18,7 +20,8 @@ space = new ball
 
 ***
 ## SPACE INVADERS:
-![space_invaders](https://user-images.githubusercontent.com/48760638/71596465-d4b83f00-2b3f-11ea-9d2f-1469e84efa4a.png)
+![space_invaders](https://user-images.githubusercontent.com/48760638/71597651-46928780-2b44-11ea-84ee-1afed4a526ab.png)
+
 `[1 Player] Destroy every aliens without diying (3 lifes)`
 
 ⬅️➡️ = move
@@ -26,7 +29,8 @@ space = shoot
 
 ***
 ## TETRIS:
-![tetris](https://user-images.githubusercontent.com/48760638/71596466-d4b83f00-2b3f-11ea-8bba-747208968090.png)
+![tetris](https://user-images.githubusercontent.com/48760638/71597652-46928780-2b44-11ea-9d19-f7e89b185b82.png)
+
 `[1 Player] Align as many bloc as possible without reaching the top`
 
 ⬅️➡️ = move the piece
@@ -36,7 +40,8 @@ space = place the piece at the bottom
 
 ***
 ## MINE SWEEPER:
-![mine_sweeper](https://user-images.githubusercontent.com/48760638/71596461-d41fa880-2b3f-11ea-88c2-b0b001a3e9ef.png)
+![mine_sweeper](https://user-images.githubusercontent.com/48760638/71597646-45f9f100-2b44-11ea-8517-d7ca14a827f9.png)
+
 `[1 Player] Open every cells except the bombs (or put a marker on every bombs)`
 
 🖱️ (left click) = reveal a cell (search mode) / put a flag (flag mode)
@@ -44,21 +49,24 @@ space bar = switch mode (search/flag)
 
 ***
 ## FLAPPY BIRD:
-![flappy_bird](https://user-images.githubusercontent.com/48760638/71596456-d3871200-2b3f-11ea-97a7-efd398ce357c.png)
+![flappy_bird](https://user-images.githubusercontent.com/48760638/71597642-45615a80-2b44-11ea-80a9-0d24e0ca8189.png)
+
 `[1 Player] Pass through as many pipes as possible`
 
 space = jump
 
 ***
 ## SNAKE:
-![snake](https://user-images.githubusercontent.com/48760638/71596464-d41fa880-2b3f-11ea-81fa-5f1ce4fe317e.png)
+![snake](https://user-images.githubusercontent.com/48760638/71597650-45f9f100-2b44-11ea-8922-5f187a6c8cb9.png)
+
 `[1 Player] Eat as many food as possible without biting your tail`
 
 ⬆️⬇️⬅️➡️ = move
 
 ***
 ## PUISSANCE 4:
-![puissance4](https://user-images.githubusercontent.com/48760638/71596463-d41fa880-2b3f-11ea-900c-dff11c22ff12.png)
+![puissance4](https://user-images.githubusercontent.com/48760638/71597649-45f9f100-2b44-11ea-95d0-f9f3957d6aa3.png)
+
 `[1 Player] Align 4 pieces of your own color`
 
 ⬅️➡️ = select a column
@@ -66,7 +74,8 @@ space = place a piece
 
 ***
 ## TIC TAC TOE:
-![tic_tac_toe](https://user-images.githubusercontent.com/48760638/71596468-d4b83f00-2b3f-11ea-9b7c-2ce1e49273a3.png)
+![tic_tac_toe](https://user-images.githubusercontent.com/48760638/71597653-46928780-2b44-11ea-9de6-81c1e606829b.png)
+
 `[2 Players] Align 3 circle or 3 cross`
 
 ⬆️⬇️⬅️➡️ = choose place
@@ -74,15 +83,15 @@ space = place a circle/cross
 
 ***
 ## 2048
-![2048](https://user-images.githubusercontent.com/48760638/71597515-bfddaa80-2b43-11ea-83d2-d75c0d076e40.png)
-
+![2048](https://user-images.githubusercontent.com/48760638/71597639-44c8c400-2b44-11ea-9609-6bfcdd410736.png)
 `...`
 
 ...
 
 ***
 ## ASTEROID
-![asteroid](https://user-images.githubusercontent.com/48760638/71596452-d2ee7b80-2b3f-11ea-8c42-cf0a65f4980a.png)
+![asteroid](https://user-images.githubusercontent.com/48760638/71597640-44c8c400-2b44-11ea-8c9c-15fe6d06c580.png)
+
 `[1 Player] Destroy all the asteroids, avoiding colisions`
 
  ⬆️ = accelerate
@@ -91,19 +100,22 @@ space = shoot
 
 ***
 ## FROGGER
-![frogger](https://user-images.githubusercontent.com/48760638/71596457-d3871200-2b3f-11ea-853d-e1008f1589bc.png)
+![frogger](https://user-images.githubusercontent.com/48760638/71597643-45615a80-2b44-11ea-8946-692d33c368d3.png)
+
 `[1 Player] Bring a frog on top of each waterlily`
 
 ⬆️⬇️⬅️➡️ = move the frog
 
 ***
 ## LISSAJOUS CURVES
-![lissajous_curves](https://user-images.githubusercontent.com/48760638/71596458-d3871200-2b3f-11ea-9362-2fb28ade1dfd.png)
+![lissajous_curves](https://user-images.githubusercontent.com/48760638/71597644-45615a80-2b44-11ea-9917-8d194784a123.png)
+
 `...`
 
 ***
 ## MAZE GENERATOR
-![maze_generator](https://user-images.githubusercontent.com/48760638/71596460-d41fa880-2b3f-11ea-9975-e218e1b1c7c7.png)
+![maze_generator](https://user-images.githubusercontent.com/48760638/71597645-45615a80-2b44-11ea-9976-8192245eb91d.png)
+
 `Maze generated randomly using a randomized version of the depth-first search algorithm`
 
 space = start

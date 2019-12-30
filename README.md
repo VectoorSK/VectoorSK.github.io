@@ -7,6 +7,7 @@ Compilation of game remake made in JavaScript
 ![pong](https://user-images.githubusercontent.com/48760638/71597648-45f9f100-2b44-11ea-82e0-95abf867f49a.png)
 
 [Z][S] = move player 1
+
 ⬆️⬇️ = move player 2
 
 ***
@@ -16,6 +17,7 @@ Compilation of game remake made in JavaScript
 ![breakout](https://user-images.githubusercontent.com/48760638/71597641-45615a80-2b44-11ea-83cc-a49954a2e170.png)
 
 ⬅️➡️ = move
+
 space = new ball
 
 ***
@@ -25,6 +27,7 @@ space = new ball
 ![space_invaders](https://user-images.githubusercontent.com/48760638/71597651-46928780-2b44-11ea-84ee-1afed4a526ab.png)
 
 ⬅️➡️ = move
+
 space = shoot
 
 ***
@@ -34,8 +37,11 @@ space = shoot
 ![tetris](https://user-images.githubusercontent.com/48760638/71597652-46928780-2b44-11ea-9d19-f7e89b185b82.png)
 
 ⬅️➡️ = move the piece
+
 ⬆️ = rotate the piece
+
 ⬇️ = increase the piece's fall speed
+
 space = place the piece at the bottom
 
 ***
@@ -45,6 +51,7 @@ space = place the piece at the bottom
 ![mine_sweeper](https://user-images.githubusercontent.com/48760638/71597646-45f9f100-2b44-11ea-8517-d7ca14a827f9.png)
 
 🖱️ (left click) = reveal a cell (search mode) / put a flag (flag mode)
+
 space bar = switch mode (search/flag)
 
 ***
@@ -70,6 +77,7 @@ space = jump
 ![puissance4](https://user-images.githubusercontent.com/48760638/71597649-45f9f100-2b44-11ea-95d0-f9f3957d6aa3.png)
 
 ⬅️➡️ = select a column
+
 space = place a piece
 
 ***
@@ -79,6 +87,7 @@ space = place a piece
 ![tic_tac_toe](https://user-images.githubusercontent.com/48760638/71597653-46928780-2b44-11ea-9de6-81c1e606829b.png)
 
 ⬆️⬇️⬅️➡️ = choose place
+
 space = place a circle/cross
 
 ***
@@ -96,7 +105,9 @@ space = place a circle/cross
 ![asteroid](https://user-images.githubusercontent.com/48760638/71597640-44c8c400-2b44-11ea-8c9c-15fe6d06c580.png)
 
  ⬆️ = accelerate
+
 ⬅️➡️ = move left/right
+
 space = shoot
 
 ***

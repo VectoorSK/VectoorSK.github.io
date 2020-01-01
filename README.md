@@ -74,11 +74,11 @@ space = jump
 
 ***
 ## 2048
-`...`
+`Combine blocs to create bigger ones`
 
 ![2048](https://user-images.githubusercontent.com/48760638/71597639-44c8c400-2b44-11ea-9609-6bfcdd410736.png)
 
-...
+⬆️⬇️⬅️➡️ = move up/down/left/right
 
 ***
 ## ASTEROID
@@ -97,15 +97,15 @@ space = jump
 ⬆️⬇️⬅️➡️ = move the frog
 
 ***
-## LISSAJOUS CURVES
-`...`
-
-![lissajous_curves](https://user-images.githubusercontent.com/48760638/71597644-45615a80-2b44-11ea-9917-8d194784a123.png)
-
-***
 ## MAZE GENERATOR
 `Maze generated randomly using a randomized version of the depth-first search algorithm`
 
 ![maze_generator](https://user-images.githubusercontent.com/48760638/71597645-45615a80-2b44-11ea-9976-8192245eb91d.png)
 
 space = start
+
+***
+## LISSAJOUS CURVES
+`...`
+
+![lissajous_curves](https://user-images.githubusercontent.com/48760638/71597644-45615a80-2b44-11ea-9917-8d194784a123.png)
